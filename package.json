@@ -1,0 +1,24 @@
+{
+  "name": "g_maps",
+  "version": "1.0.1",
+  "description": "mapping application",
+  "notes":"Fixed submit functionality, added satellite layer and switching",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Robert Fox",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^7.0.0",
+    "electron-packager": "^14.1.0",
+    "electron-rebuild": "^1.8.6",
+    "ol": "^5.3.3",
+    "parcel-bundler": "^1.12.4"
+  },
+  "dependencies": {
+    "lowdb": "^1.0.0",
+    "shortid": "^2.2.15"
+  }
+}

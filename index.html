@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./ol.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="jquery-3.4.1.min.js"></script>
+    <script>if (window.module) module = window.module;</script>
+    <script src="./ol.js"></script>
+    <script src="code.js"></script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="map-table_wrapper">
+            <div id="map" class="map"></div>
+            <div id="table_div">
+                <table id="location_table">
+                    <thead>
+                        <td id="T_Name">Name</td>
+                        <td class='address'>Coordinates</td>
+                        <td>Picture</td>
+                        <td>Edit</td>
+                        <td>Delete</td>
+                    </thead>
+                    <tbody id="L_Table_Body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id='form'>
+                <form id="new_location">
+                    <input name="Name" id="Name" type="text" placeholder="Location Name" required><br>
+                    <input name="Address" id="Address" type="text" placeholder="Coordinates" required><br>
+                    <input name="Image" id="Pic" type="text" placeholder="Full Path to Image(s) (if none put N/A)"><br>
+                    <textarea id="Description" placeholder="Describe the Location"></textarea><br>
+                    <input type="submit" value="submit">
+                </form>
+                <button id="layers" onclick='switch_layer()'>Layer</button>
+        </div>
+    </div>
+    <script>
+        var num = 0;
+        var map = new ol.Map({
+            target: "map",
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+            ],
+            view: new ol.View({
+                //INPUT LONG, LAT FOR WHERE MAP SHOULD DEFAULT CENTER
+                center: ol.proj.fromLonLat([,]),
+                zoom: 10,
+                    maxZoom:19,
+            })
+        });
+        var marker_style1 = [
+            new ol.style.Style({
+                image: new ol.style.Icon({
+                    scale: .75,
+                    src: "https://upload.wikimedia.org/wikipedia/commons/d/d1/Google_Maps_pin.svg",
+                }),
+            zIndex: 5,
+            }), 
+        ];
+        var layersstreet = new ol.layer.Group({
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ]
+        })
+        var layerssat = new ol.layer.Group({
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.XYZ({
+                    attributions: ['Powered by Esri',
+                                'Source: Esri, DigitalGlobe, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'],
+                    attributionsCollapsible: false,
+                    url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                    maxZoom: 19
+                    })
+                })
+            ]
+        })
+        function switch_layer(){
+            if(num == 0){
+                num = 1;
+                map.setLayerGroup(layerssat)
+            }
+            else{
+                num = 0;
+                map.setLayerGroup(layersstreet)
+            }
+            updateMap()
+        }
+        $("#T_Name").click(function(){
+            var table = $(this).parents("table").eq(0);
+            var rows = table.find('tr:gt(0)').toArray().sort(comparer($(this).index()));
+            this.asc = !this.asc;
+            if(!this.asc){
+                rows = rows.reverse();
+            }
+            for(var i = 0; i < rows.length; i++){
+                table.append(rows[i]);
+            }
+        });
+        function comparer(index){
+            return function(a,b){
+                var valA = getCellValue(a, index), valB = getCellValue(b, index)
+                return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
+            }
+        }
+        function getCellValue(row, index){
+            return $(row).children('td').eq(index).text()
+        }
+        function hideShit(){
+            $("img").hide()
+            $(".pic").mouseenter(function(event){
+                if($(this).children('img')){
+                    var width = $(this).children('img').width()
+                    var height = $(this).children('img').height()
+                    $(this).children('img').css({"position":"fixed", "left": event.clientX+15, "top":event.clientY, "height":height_or_width(height, width)[0], "width":height_or_width(height, width)[1]})
+                    $(this).children('img').show()
+                }
+            })
+            $(".pic").mouseleave(function(){
+                if($(this).children('img')){
+                    $(this).children('img').css({})
+                    $(this).children('img').hide()
+                }
+            })
+            $("td").children('div').hide()
+            $(".name").mouseenter(function(event){
+                var width = $(this).width()/2
+                $(this).mousemove(function(e){
+                    if(e.clientX <= width){
+                        $(this).children('div').css({"position":"fixed", "left": e.clientX-30, "top":e.clientY})
+                        $(this).children('div').show()
+                    }
+                })
+            })
+            $(".name").mouseleave(function(){
+                if($(this).children('div')){
+                    $(this).children('div').hide()
+                }
+            })
+            $(".location").click(function(event){
+                var location = event.target.textContent;
+                location = location.split(", ")
+                map.setView(new ol.View({
+                    center: ol.proj.fromLonLat([parseFloat(location[1]), parseFloat(location[0])]),
+                    zoom:17,
+                    maxZoom:19,
+                }))
+            })
+            $(".address").click(function(event){
+                map.setView(new ol.View({     
+                    //INPUT LONG, LAT FOR WHERE MAP SHOULD DEFAULT CENTER
+                    center: ol.proj.fromLonLat([,]),
+                    zoom: 10,
+                    maxZoom:19,
+                }))
+            })
+        }
+        
+        function removeSpaces(str){
+                var newStr = '';
+                for(var i = 0; i < str.length; i++){
+                    if(str[i] == ' '){
+                        newStr+='%20';
+                    }
+                    else if(str[i] == '\\'){
+                        newStr+='\\\\';
+                    }
+                    else{
+                        newStr += str[i];
+                    }
+                }
+                return newStr;
+            }
+        
+        $('#new_location').submit(function(event){
+                event.preventDefault();
+                submit_new($("#Name").val(), $("#Address").val(), $("#Pic").val(), $("#Description").val());
+            location.reload();
+        })
+
+        function updateMap(){
+            var table_data = read();
+            marker_list = [];
+            $("#L_Table_Body").children().remove();
+            for(key in table_data){
+                var marker = new ol.Feature({
+                    geometry: new ol.geom.Point(
+                        ol.proj.fromLonLat([get_long(key), get_lat(key)])
+                    ),
+                });
+                marker_list.push(marker);
+                if(get_pic(key) !== "N/A"){
+                    var pic_url = get_pic(key)[0];
+                    $("#L_Table_Body").append(
+                        "<tr id=" + key + "><td class='name'>" + get_name(key) + "<div style='positions: absolute;'>" + get_notes(key) + "</div></td><td class='location'>" + get_lat(key) + ", " + get_long(key) + "</td><td class='pic'>True <img id=\'" + key + "\'style='position: absolute; image-orientation: from-image; width: 30%; height: 30%;' src=" + removeSpaces(pic_url) + "></td><td><button onclick='edit_item($(this).parents(\"tr\").attr(\"id\"))'>Edit</button></td><td><button onclick='delete_item($(this).parents(\"tr\").attr(\"id\"))'>Delete</button></td></tr>"
+                    )
+                }
+                else{
+                    $("#L_Table_Body").append(
+                        "<tr id=" + key + "><td class='name'>" + get_name(key) + "<div style='positions: absolute;'>" + get_notes(key) + "</div></td><td class='location'>" + get_lat(key) + ", " + get_long(key) + "</td><td class='pic'>False</td><td><button onclick='edit_item($(this).parents(\"tr\").attr(\"id\"))'>Edit</button></td><td><button onclick='delete_item($(this).parents(\"tr\").attr(\"id\"))'>Delete</button></td></tr>"
+                    )
+                }
+                
+            }
+            hideShit();
+            var vectorSource = new ol.source.Vector({
+                features: marker_list
+            });
+            var markerVectorLayer = new ol.layer.Vector({
+                source: vectorSource,
+                style: function(feature, resolution){
+                    return marker_style1;
+                }
+            })
+            map.addLayer(markerVectorLayer)
+        } 
+        $(document).ready(function(){
+            updateMap();
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+#wrapper{
+    margin-top: 10px;
+    margin-left: 10px;
+    display: flex;
+    height: 95vh;
+    width: 95vw;
+}
+#wrapper > div:first-child{
+    flex: 0 0 75vw;
+    height: 95vh;
+    display: flex;
+    flex-direction: column;
+}
+#wrapper > div:first-child > div{
+    flex:1;
+}
+#wrapper > div:last-child{
+    flex: 0 0 20vw;
+    height: 95vh;
+}
+#map{
+    width: 75vw;
+    height:60vh;
+    background-color: gray;
+    display: inline-block;
+}
+#form{
+    height:95vh;
+    vertical-align: top;
+}
+#new_location{
+    height:95vh;
+}
+#Name{
+    height:5vh;
+}
+#Address{
+    height:5vh;
+}
+#Pic{
+    height:5vh;
+}
+#Description{
+    height:70vh;
+}
+#map > div{
+    width:9vw;
+    height:9vh;
+}
+td > div{
+    background-color: lightgoldenrodyellow;
+    margin-left: -15px;
+    margin-top: -15px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+#table_div{
+    height:25vh;
+    display: block;
+    position: relative;
+    overflow-y: scroll;
+}
+#location_table{
+    width: 75vw;
+    height: 10vh;
+    padding-left: 15px;
+    font-size: 2.5vmin;
+    border: 1px solid black;
+}
+thead{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+tbody > tr > td{
+    padding-right: 15px;
+    text-align:left;
+}
+tbody > tr:nth-child(odd){
+    background-color: #f2f2f2;
+}
+tbody > tr:hover{
+    background-color:lightblue;
+}
+img{
+    margin-top: -10%;
+    margin-left: 10px;
+}
+td > div{
+    font-size: 2.5vmin;
+    margin-left: 55px;
+}
+input{
+    width:20vw;
+    margin-bottom:5px;
+}
+textarea{
+    height:45vh;
+    width: 20vw;
+}
+#layers{
+    position: absolute;
+    left:50px;
+    top:25px;
+    width:5vw;
+    font-size: 1.5vmin;
+}
