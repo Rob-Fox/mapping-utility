@@ -11,7 +11,7 @@
   "author": "Robert Fox",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^7.0.0",
+    "electron": "^18.3.7",
     "electron-packager": "^14.1.0",
     "electron-rebuild": "^1.8.6",
     "ol": "^5.3.3",
